@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -25,8 +27,8 @@ import modelo.Modelo;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView txtUsuario;
-    TextView txtContrasenia;
+    EditText txtUsuario;
+    EditText txtContrasenia;
     RequestQueue requestQueue;
 
     @Override
@@ -38,42 +40,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void validarLogin(View view) {
-        String url = "https://evaladmin.uteq.edu.ec/ws/listadoaevaluar.php?e=";
-        JsonObjectRequest request = new JsonObjectRequest(
+        String url = "https://my-json-server.typicode.com/cturriagos/LoginNaView_RT/users?usuario=" +txtUsuario.getText().toString();
+        JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET, url , null ,
-                new com.android.volley.Response.Listener<JSONObject>() {
+                new com.android.volley.Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
                         try {
-                            JSONArray jsonarr = response.getJSONArray("");
-                            int size = jsonarr.length();
-                            JSONObject json_transform;
-                            if (size > 0) {
+                            if(response.length() > 0) {
+                                JSONObject jsonob = response.getJSONObject(0);
                                 Modelo mod;
-                                for (int i = 0; i < size; i++) {
-                                    json_transform = jsonarr.getJSONObject(i);
-                                    mod = new Modelo(json_transform.getString("usuario"),
-                                                     json_transform.getString("contrasenia"),
-                                                     json_transform.getString("tipo_usuario"));
-                                    if (mod.getUsuario().equalsIgnoreCase(txtUsuario.getText().toString())){
-                                        if (mod.getContrasenia().equals(txtContrasenia.getText().toString())){
-                                            Intent intent = new Intent(MainActivity.this, PrincipalActivity.class);
-                                            Bundle b = new Bundle();
+                                mod = new Modelo(jsonob.getString("usuario"),
+                                        jsonob.getString("contrasenia"),
+                                        jsonob.getString("tipo_usuario"));
+                                if (mod.getUsuario().equalsIgnoreCase(txtUsuario.getText().toString())) {
+                                    if (mod.getContrasenia().equals(txtContrasenia.getText().toString())) {
+                                        Intent intent = new Intent(MainActivity.this, PrincipalActivity.class);
+                                        Bundle b = new Bundle();
 
-                                            b.putSerializable("Modelo", mod);
+                                        b.putSerializable("Modelo", mod);
 
-                                            intent.putExtras(b);
-                                            startActivity(intent);
-                                        }
-                                    } else {
-                                        Toast.makeText(MainActivity.this,
-                                                         "ERROR DE INICIO DE SESIÓN",
-                                                              Toast.LENGTH_LONG).show();
-
+                                        intent.putExtras(b);
+                                        startActivity(intent);
                                     }
+                                } else {
+                                    Toast.makeText(MainActivity.this,
+                                            "ERROR DE INICIO DE SESIÓN",
+                                            Toast.LENGTH_LONG).show();
+
                                 }
                             }
-                        } catch (JSONException e) {
+                            } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
