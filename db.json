@@ -1,0 +1,14 @@
+{
+   "users":[
+      {
+         "usuario":"churribrand",
+         "contrasenia":"1234",
+         "tipo_usuario":"admin"
+      },
+      {
+         "usuario":"usina",
+         "contrasenia":"123456",
+         "tipo_usuario":"user"
+      }
+   ]
+}
